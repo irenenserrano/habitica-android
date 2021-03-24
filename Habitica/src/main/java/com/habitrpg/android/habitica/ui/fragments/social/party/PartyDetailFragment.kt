@@ -1,6 +1,7 @@
 package com.habitrpg.android.habitica.ui.fragments.social.party
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import com.habitrpg.android.habitica.R
 import com.habitrpg.android.habitica.components.UserComponent
+import com.habitrpg.android.habitica.data.ChallengeRepository
 import com.habitrpg.android.habitica.data.InventoryRepository
 import com.habitrpg.android.habitica.data.SocialRepository
 import com.habitrpg.android.habitica.data.UserRepository
@@ -20,6 +22,8 @@ import com.habitrpg.android.habitica.helpers.MainNavigationController
 import com.habitrpg.android.habitica.helpers.RxErrorHandler
 import com.habitrpg.android.habitica.models.inventory.QuestContent
 import com.habitrpg.android.habitica.models.members.Member
+import com.habitrpg.android.habitica.models.social.Challenge
+import com.habitrpg.android.habitica.models.social.ChallengeMembership
 import com.habitrpg.android.habitica.models.social.Group
 import com.habitrpg.android.habitica.models.user.User
 import com.habitrpg.android.habitica.modules.AppModule
@@ -35,6 +39,8 @@ import com.habitrpg.android.habitica.ui.viewHolders.GroupMemberViewHolder
 import com.habitrpg.android.habitica.ui.viewmodels.PartyViewModel
 import com.habitrpg.android.habitica.ui.views.HabiticaSnackbar
 import com.habitrpg.android.habitica.ui.views.dialogs.HabiticaAlertDialog
+import io.reactivex.rxjava3.core.Flowable
+import io.realm.RealmList
 import io.realm.RealmResults
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -42,6 +48,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Named
+
 
 class PartyDetailFragment : BaseFragment<FragmentPartyDetailBinding>() {
 
@@ -61,6 +68,9 @@ class PartyDetailFragment : BaseFragment<FragmentPartyDetailBinding>() {
     lateinit var inventoryRepository: InventoryRepository
     @field:[Inject Named(AppModule.NAMED_USER_ID)]
     lateinit var userId: String
+
+    @Inject
+    lateinit var challengeRepository: ChallengeRepository
 
     override fun injectFragment(component: UserComponent) {
         component.inject(this)
@@ -332,7 +342,18 @@ class PartyDetailFragment : BaseFragment<FragmentPartyDetailBinding>() {
 
     internal fun leaveParty() {
         val context = context
+        var user = viewModel?.getUserData()?.value?.id
         if (context != null) {
+            Log.d("User Challenges", challengeRepository.getUserChallenges().toString())
+            Log.d("Challenges", challengeRepository.getChallenges().toString())
+
+            challengeRepository.getUserChallenges(user).subscribe({
+                entry -> Log.d("UserChallenge", entry.toString())
+            })
+
+//            challengeRepository.getChallenges().subscribe({
+//                entry -> Log.d("Challenge", entry.toString())
+//            })
             val alert = HabiticaAlertDialog(context)
             alert.setMessage(R.string.leave_party_confirmation)
             alert.addButton(R.string.keep_challenges, true) { _, _ ->

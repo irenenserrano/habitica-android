@@ -7,6 +7,7 @@ apply plugin: 'com.noveogroup.android.check'
 apply plugin: 'realm-android'
 apply plugin: 'androidx.navigation.safeargs'
 apply plugin: 'com.google.firebase.firebase-perf'
+apply plugin: 'com.google.gms.google-services'
 
 buildscript {
     repositories {
@@ -40,6 +41,7 @@ repositories {
 }
 
 dependencies {
+    implementation platform('com.google.firebase:firebase-bom:26.4.0')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     //Networking
     implementation 'com.squareup.okhttp3:okhttp:4.9.0'
